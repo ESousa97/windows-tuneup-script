@@ -1,6 +1,6 @@
 ' =====================================================
 '  Tune-Up com Menu (Aplicar / Reverter / Reparos / Avancado)
-'  Autor: ChatGPT (para Enoque) - 2025-08-27
+'  Autor: Enoque Sousa - 2025-08-27
 '  Requer: Admin. Log: C:\TuneUp_Log.txt  Backup: C:\TuneUp_Backup.ini
 ' =====================================================
 
