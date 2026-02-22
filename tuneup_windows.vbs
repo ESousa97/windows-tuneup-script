@@ -9,8 +9,17 @@ Dim sh, fso, logPath, bakPath, logFile
 Set sh  = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 
-logPath = "C:\TuneUp_Log.txt"
-bakPath = "C:\TuneUp_Backup.ini"
+Const DEFAULT_LOG_PATH = "C:\TuneUp_Log.txt"
+Const DEFAULT_BAK_PATH = "C:\TuneUp_Backup.ini"
+Const SVC_WINDOWS_UPDATE = "wuauserv"
+Const SVC_WINDOWS_SEARCH = "WSearch"
+Const SVC_SYSMAIN = "SysMain"
+Const TASK_COMPAT_APPRAISER = "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser"
+Const TASK_PROGRAM_DATA_UPDATER = "\Microsoft\Windows\Application Experience\ProgramDataUpdater"
+Const TASK_STARTUP_APP = "\Microsoft\Windows\Application Experience\StartupAppTask"
+
+logPath = ResolveOutputPath("TUNEUP_LOG_PATH", DEFAULT_LOG_PATH)
+bakPath = ResolveOutputPath("TUNEUP_BACKUP_PATH", DEFAULT_BAK_PATH)
 
 ' ---------- Auto-elevacao ----------
 If Not IsAdmin() Then
@@ -46,9 +55,9 @@ Do
       ' --- Aplicar otimizacoes ---
       Case 2: EnsureSnapshot: CleanTemp sh.ExpandEnvironmentStrings("%TEMP%"): CleanTemp "C:\Windows\Temp": MsgBox "Temporarios limpos."
       Case 3: EnsureSnapshot: DisableAppraiser: MsgBox "Compatibility Appraiser desabilitado."
-      Case 4: EnsureSnapshot: StopDisableService "wuauserv": MsgBox "Windows Update desabilitado."
-      Case 5: EnsureSnapshot: StopDisableService "WSearch": MsgBox "Windows Search desabilitado."
-      Case 6: EnsureSnapshot: StopDisableService "SysMain": MsgBox "SysMain/Superfetch desabilitado."
+      Case 4: EnsureSnapshot: StopDisableService SVC_WINDOWS_UPDATE: MsgBox "Windows Update desabilitado."
+      Case 5: EnsureSnapshot: StopDisableService SVC_WINDOWS_SEARCH: MsgBox "Windows Search desabilitado."
+      Case 6: EnsureSnapshot: StopDisableService SVC_SYSMAIN: MsgBox "SysMain/Superfetch desabilitado."
       Case 7: EnsureSnapshot: SetHighPerformancePlan: MsgBox "Plano de Energia: Alto Desempenho/Ultimate aplicado."
       Case 8: EnsureSnapshot: OptimizeVisualEffects: MsgBox "Efeitos Visuais ajustados para melhor desempenho."
       Case 9: EnsureSnapshot: PrepareCleanMgrSageRun: RunHidden "cleanmgr.exe /sagerun:1", True: MsgBox "Limpeza profunda executada."
@@ -57,9 +66,9 @@ Do
         EnsureSnapshot
         CleanTemp sh.ExpandEnvironmentStrings("%TEMP%"): CleanTemp "C:\Windows\Temp"
         DisableAppraiser
-        StopDisableService "wuauserv"
-        StopDisableService "WSearch"
-        StopDisableService "SysMain"
+        StopDisableService SVC_WINDOWS_UPDATE
+        StopDisableService SVC_WINDOWS_SEARCH
+        StopDisableService SVC_SYSMAIN
         SetHighPerformancePlan
         OptimizeVisualEffects
         PrepareCleanMgrSageRun: RunHidden "cleanmgr.exe /sagerun:1", True
@@ -68,9 +77,9 @@ Do
 
       ' --- Reverter otimizacoes ---
       Case 203: ReEnableAppraiser: MsgBox "Compatibility Appraiser reativado."
-      Case 204: RevertService "wuauserv": MsgBox "Windows Update revertido ao estado anterior."
-      Case 205: RevertService "WSearch": MsgBox "Windows Search revertido ao estado anterior."
-      Case 206: RevertService "SysMain": MsgBox "SysMain revertido ao estado anterior."
+      Case 204: RevertService SVC_WINDOWS_UPDATE: MsgBox "Windows Update revertido ao estado anterior."
+      Case 205: RevertService SVC_WINDOWS_SEARCH: MsgBox "Windows Search revertido ao estado anterior."
+      Case 206: RevertService SVC_SYSMAIN: MsgBox "SysMain revertido ao estado anterior."
       Case 207: RestorePowerPlan: MsgBox "Plano de energia anterior restaurado."
       Case 208: RestoreVisualEffects: MsgBox "Efeitos Visuais anteriores restaurados."
       Case 99:  RestoreAll
@@ -216,12 +225,12 @@ End Sub
 
 Sub SnapshotState()
   Call LogLine("Criando snapshot em " & bakPath)
-  SnapshotService "wuauserv"
-  SnapshotService "WSearch"
-  SnapshotService "SysMain"
-  SnapshotTask "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser"
-  SnapshotTask "\Microsoft\Windows\Application Experience\ProgramDataUpdater"
-  SnapshotTask "\Microsoft\Windows\Application Experience\StartupAppTask"
+  SnapshotService SVC_WINDOWS_UPDATE
+  SnapshotService SVC_WINDOWS_SEARCH
+  SnapshotService SVC_SYSMAIN
+  SnapshotTask TASK_COMPAT_APPRAISER
+  SnapshotTask TASK_PROGRAM_DATA_UPDATER
+  SnapshotTask TASK_STARTUP_APP
   WriteKV "Power.ActiveGUID", GetActivePowerPlanGUID()
   SnapshotReg "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\VisualFXSetting"
   SnapshotReg "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\VisualFXSetting"
@@ -268,9 +277,9 @@ End Function
 
 ' =============== ACOES (APLICAR/REVERTER) – iguais a sua versao ===============
 Sub DisableAppraiser()
-  DisableTask "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser"
-  DisableTask "\Microsoft\Windows\Application Experience\ProgramDataUpdater"
-  DisableTask "\Microsoft\Windows\Application Experience\StartupAppTask"
+  DisableTask TASK_COMPAT_APPRAISER
+  DisableTask TASK_PROGRAM_DATA_UPDATER
+  DisableTask TASK_STARTUP_APP
 End Sub
 
 Sub StopDisableService(svcName)
@@ -341,9 +350,9 @@ Sub DisableTask(taskPath)
 End Sub
 
 Sub ReEnableAppraiser()
-  EnableTask "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser"
-  EnableTask "\Microsoft\Windows\Application Experience\ProgramDataUpdater"
-  EnableTask "\Microsoft\Windows\Application Experience\StartupAppTask"
+  EnableTask TASK_COMPAT_APPRAISER
+  EnableTask TASK_PROGRAM_DATA_UPDATER
+  EnableTask TASK_STARTUP_APP
 End Sub
 
 Sub EnableTask(taskPath)
@@ -403,9 +412,9 @@ End Sub
 Sub RestoreAll()
   If Not fso.FileExists(bakPath) Then MsgBox "Snapshot nao encontrado.", vbExclamation: Exit Sub
   ReEnableAppraiser
-  RevertService "wuauserv"
-  RevertService "WSearch"
-  RevertService "SysMain"
+  RevertService SVC_WINDOWS_UPDATE
+  RevertService SVC_WINDOWS_SEARCH
+  RevertService SVC_SYSMAIN
   RestorePowerPlan
   RestoreVisualEffects
   MsgBox "Reversao completa (onde aplicavel) concluida."
@@ -506,13 +515,23 @@ Sub RunDISMWithSource()
   Dim src, idx, ext, arg
   src = InputBox("Caminho para install.wim ou install.esd (ex.: D:\sources\install.wim)", "DISM com Fonte Local", "")
   If src = "" Then Exit Sub
+  src = Trim(src)
+  If Not IsValidLocalImagePath(src) Then
+    MsgBox "Caminho invalido. Informe um arquivo local .wim/.esd existente e sem caracteres de comando.", vbExclamation
+    Exit Sub
+  End If
   idx = InputBox("INDEX da imagem (ex.: 1 ou 6)", "DISM com Fonte Local", "1")
   If idx = "" Then Exit Sub
+  idx = Trim(idx)
+  If (Not IsNumeric(idx)) Or CLng(idx) < 1 Then
+    MsgBox "INDEX invalido. Informe um numero inteiro maior ou igual a 1.", vbExclamation
+    Exit Sub
+  End If
   ext = LCase(Right(src, 3))
   If ext = "wim" Then
-    arg = "/RestoreHealth /Source:wim:" & Chr(34) & src & Chr(34) & ":" & idx & " /LimitAccess"
+    arg = "/RestoreHealth /Source:wim:" & Chr(34) & src & Chr(34) & ":" & CStr(CLng(idx)) & " /LimitAccess"
   ElseIf ext = "esd" Then
-    arg = "/RestoreHealth /Source:esd:" & Chr(34) & src & Chr(34) & ":" & idx & " /LimitAccess"
+    arg = "/RestoreHealth /Source:esd:" & Chr(34) & src & Chr(34) & ":" & CStr(CLng(idx)) & " /LimitAccess"
   Else
     MsgBox "Extensao nao reconhecida. Use .wim ou .esd", vbExclamation: Exit Sub
   End If
@@ -608,6 +627,27 @@ End Function
 
 Function NullToEmpty(v)
   If IsNull(v) Then NullToEmpty = "" Else NullToEmpty = v
+End Function
+
+Function ResolveOutputPath(envVarName, fallbackPath)
+  Dim envValue
+  envValue = Trim(sh.Environment("PROCESS")(envVarName))
+  If envValue = "" Then
+    ResolveOutputPath = fallbackPath
+  Else
+    ResolveOutputPath = envValue
+  End If
+End Function
+
+Function IsValidLocalImagePath(pathValue)
+  Dim p
+  p = LCase(Trim(pathValue))
+  If p = "" Then IsValidLocalImagePath = False: Exit Function
+  If InStr(p, Chr(34)) > 0 Then IsValidLocalImagePath = False: Exit Function
+  If InStr(p, "&") > 0 Or InStr(p, "|") > 0 Or InStr(p, ">") > 0 Or InStr(p, "<") > 0 Then IsValidLocalImagePath = False: Exit Function
+  If Right(p, 4) <> ".wim" And Right(p, 4) <> ".esd" Then IsValidLocalImagePath = False: Exit Function
+  If Not fso.FileExists(pathValue) Then IsValidLocalImagePath = False: Exit Function
+  IsValidLocalImagePath = True
 End Function
 
 Sub RunHidden(cmd, wait)

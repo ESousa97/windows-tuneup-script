@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run lint checks
+        shell: pwsh
+        run: ./scripts/lint.ps1
+
+      - name: Run tests
+        shell: pwsh
+        run: ./scripts/test.ps1
+
+      - name: Build distributable
+        shell: pwsh
+        run: ./scripts/build.ps1
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-tuneup-dist
+          path: dist/windows-tuneup-script.zip

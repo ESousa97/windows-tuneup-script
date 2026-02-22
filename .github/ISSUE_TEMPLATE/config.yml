@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Repositório arquivado (somente estudo)
+    url: https://github.com/ESousa97/windows-tuneup-script
+    about: Este repositório não está mais ativo, permanece público apenas para estudo e não há garantia de resposta, revisão ou correção.
+  - name: Security reports
+    url: https://github.com/ESousa97/windows-tuneup-script/security/policy
+    about: Reporte vulnerabilidades seguindo o fluxo definido em SECURITY.md

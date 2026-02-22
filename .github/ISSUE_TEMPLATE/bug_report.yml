@@ -1,0 +1,68 @@
+name: Bug report
+description: Reporte um comportamento inesperado no script
+title: "fix: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Repositório arquivado
+        Este repositório não está mais ativo e permanece público somente para estudo.
+        Não há garantia de resposta, revisão ou correção.
+
+        Obrigado por reportar. Preencha os campos abaixo para facilitar a reprodução.
+  - type: input
+    id: summary
+    attributes:
+      label: Resumo
+      description: Descreva o problema em uma frase.
+      placeholder: Ao executar a opção 306, o reset do Windows Update falha.
+    validations:
+      required: true
+  - type: dropdown
+    id: windows-version
+    attributes:
+      label: Versão do Windows
+      options:
+        - Windows 7
+        - Windows 8/8.1
+        - Windows 10
+        - Windows 11
+        - Outro
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      description: Informe os passos na ordem exata.
+      placeholder: |
+        1. Executar tuneup_windows.vbs como administrador
+        2. Selecionar 300
+        3. Selecionar 306
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamento atual
+    validations:
+      required: true
+  - type: input
+    id: log-path
+    attributes:
+      label: Caminho do log
+      description: Caminho do arquivo de log utilizado.
+      placeholder: C:\TuneUp_Log.txt
+  - type: textarea
+    id: extra
+    attributes:
+      label: Contexto adicional
+      description: Mensagens de erro, prints e observações relevantes.

@@ -1,0 +1,17 @@
+name: Security Audit
+
+on:
+  schedule:
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+jobs:
+  security:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run basic secret scan
+        shell: pwsh
+        run: ./scripts/security-audit.ps1

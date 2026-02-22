@@ -1,0 +1,49 @@
+name: Feature request
+description: Sugira uma melhoria para o projeto
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Repositório arquivado
+        Este repositório não está mais ativo e permanece público somente para estudo.
+        Não há garantia de resposta, revisão ou correção.
+
+  - type: input
+    id: summary
+    attributes:
+      label: Resumo da proposta
+      placeholder: Adicionar opção para exportar relatório de inventário completo.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema que a proposta resolve
+      description: Qual dor atual essa melhoria resolve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Solução proposta
+      description: Descreva comportamento, fluxo e impacto esperado.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+      description: Cite abordagens alternativas e por que não atendem tão bem.
+  - type: dropdown
+    id: breaking-change
+    attributes:
+      label: A proposta pode quebrar compatibilidade?
+      options:
+        - Não
+        - Sim
+        - Não sei
+    validations:
+      required: true

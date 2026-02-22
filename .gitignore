@@ -1,0 +1,50 @@
+# Internal reports
+BASELINE.md
+FINAL.md
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs and temp artifacts
+*.log
+logs/
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Script-generated outputs
+TuneUp_Log.txt
+TuneUp_Backup.ini
+*.bak
+*.bak_*
+
+# Build/coverage artifacts
+coverage/
+.nyc_output/
+dist/
+build/
+
+# Dependency directories
+node_modules/
+venv/
+.venv/
+
+# IDE/Editor
+.vscode/settings.json
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Lock files from editors/tools
+*.swp
+*.swo
